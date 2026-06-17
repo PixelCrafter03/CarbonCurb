@@ -1,0 +1,22 @@
+[
+  {
+    "zip_code": "75069",
+    "students": 26,
+    "co2_saved": 65.0
+  },
+  {
+    "zip_code": "75070",
+    "students": 26,
+    "co2_saved": 65.0
+  },
+  {
+    "zip_code": "75071",
+    "students": 20,
+    "co2_saved": 50.0
+  },
+  {
+    "zip_code": "75072",
+    "students": 28,
+    "co2_saved": 70.0
+  }
+]
