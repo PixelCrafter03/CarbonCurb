@@ -1,0 +1,50 @@
+[
+  {
+    "school_id": "TX001",
+    "school_name": "McKinney High School",
+    "district": "McKinney ISD",
+    "city": "McKinney",
+    "state": "TX",
+    "lat": 33.1970,
+    "lng": -96.6150,
+    "students": 1500,
+    "co2_saved": 65,
+    "ai_recommendation": "Create walking groups and optimize neighborhood routes."
+  },
+  {
+    "school_id": "CA001",
+    "school_name": "Lincoln High School",
+    "district": "Los Angeles Unified School District",
+    "city": "Los Angeles",
+    "state": "CA",
+    "lat": 34.0522,
+    "lng": -118.2437,
+    "students": 1200,
+    "co2_saved": 90,
+    "ai_recommendation": "Promote walking and biking corridors."
+  },
+  {
+    "school_id": "NY001",
+    "school_name": "Brooklyn Technical High School",
+    "district": "NYC Public Schools",
+    "city": "Brooklyn",
+    "state": "NY",
+    "lat": 40.6887,
+    "lng": -73.9764,
+    "students": 6000,
+    "co2_saved": 120,
+    "ai_recommendation": "Create student commute clusters by neighborhood."
+  },
+  {
+    "school_id": "FL001",
+    "school_name": "Miami Senior High School",
+    "district": "Miami-Dade County Public Schools",
+    "city": "Miami",
+    "state": "FL",
+    "lat": 25.7825,
+    "lng": -80.2190,
+    "students": 2800,
+    "co2_saved": 80,
+    "ai_recommendation": "Optimize bus and walking routes."
+  }
+]

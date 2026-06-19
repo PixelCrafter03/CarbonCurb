@@ -1,0 +1,26 @@
+[
+  {
+    "school_id": "mckinney_high_001",
+    "school_name": "McKinney High School",
+    "district": "McKinney ISD",
+    "city": "McKinney",
+    "state": "TX",
+    "lat": 33.1970,
+    "lng": -96.6150,
+    "students": 26,
+    "co2_saved": 65,
+    "ai_recommendation": "Create supervised walking groups and optimize neighborhood pickup points."
+  },
+  {
+    "school_id": "frisco_high_001",
+    "school_name": "Frisco High School",
+    "district": "Frisco ISD",
+    "city": "Frisco",
+    "state": "TX",
+    "lat": 33.1507,
+    "lng": -96.8236,
+    "students": 40,
+    "co2_saved": 100,
+    "ai_recommendation": "Create bike and walking corridors for nearby students."
+  }
+]

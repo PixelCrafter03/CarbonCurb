@@ -1,0 +1,34 @@
+[
+  {
+    "zip_code": "75069",
+    "lat": 33.1940,
+    "lng": -96.6150,
+    "students": 26,
+    "co2_saved": 65.0,
+    "ai_recommendation": "• Create supervised walking groups with designated student leaders.\n• Use marked crossings and stay on approved routes.\n• This route could save approximately 65.0 kg of CO₂ emissions."
+  },
+  {
+    "zip_code": "75070",
+    "lat": 33.1778,
+    "lng": -96.6989,
+    "students": 26,
+    "co2_saved": 65.0,
+    "ai_recommendation": "• Create supervised walking groups with designated student leaders.\n• Use marked crossings and stay on approved routes.\n• This route could save approximately 65.0 kg of CO₂ emissions."
+  },
+  {
+    "zip_code": "75071",
+    "lat": 33.2015,
+    "lng": -96.6900,
+    "students": 20,
+    "co2_saved": 50.0,
+    "ai_recommendation": "• Encourage walking pairs and neighborhood meet-up points.\n• Use marked crossings and stay on approved routes.\n• This route could save approximately 50.0 kg of CO₂ emissions."
+  },
+  {
+    "zip_code": "75072",
+    "lat": 33.0140,
+    "lng": -96.7200,
+    "students": 28,
+    "co2_saved": 70.0,
+    "ai_recommendation": "• Create supervised walking groups with designated student leaders.\n• Use marked crossings and stay on approved routes.\n• This route could save approximately 70.0 kg of CO₂ emissions."
+  }
+]

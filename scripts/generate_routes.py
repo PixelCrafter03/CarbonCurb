@@ -1,64 +1,27 @@
 import json
-import os
+from commute_ai import generate_commute_plan
 
+# Load commute groups
+with open("data/green_commute_groups.json", "r") as f:
+    groups = json.load(f)
 
-BASE_DIR = os.path.dirname(
-    os.path.dirname(
-        os.path.abspath(__file__)
-    )
-)
-
-
-groups_path = os.path.join(
-    BASE_DIR,
-    "data",
-    "green_commute_groups.json"
-)
-
-
-coords_path = os.path.join(
-    BASE_DIR,
-    "data",
-    "zip_coordinates.json"
-)
-
-
-groups = json.load(
-    open(groups_path)
-)
-
-
-coords = json.load(
-    open(coords_path)
-)
-
+routes = []
 
 for group in groups:
 
-    zip_code = group["zip_code"]
+    route = {
+        "zip_code": group["zip_code"],
+        "students": group["students"],
+        "co2_saved": group["co2_saved"]
+    }
 
+    route["ai_recommendation"] = generate_commute_plan(route)
 
-    location = next(
-        x for x in coords
-        if x["zip_code"] == zip_code
-    )
+    routes.append(route)
 
+# Save routes
+with open("data/routes_with_ai.json", "w") as f:
+    json.dump(routes, f, indent=4)
 
-    print(
-        f"""
-Green Route:
-
-ZIP:
-{zip_code}
-
-Students:
-{group['students']}
-
-CO2 Saved:
-{group['co2_saved']} kg
-
-Location:
-{location['lat']}, {location['lng']}
-
-"""
-    )
+print("Generated routes_with_ai.json successfully!")
+print(f"Created {len(routes)} routes.")
