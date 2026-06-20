@@ -1,110 +1,112 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-export default function CarbonMap({ routes }: any) {
-  const [MapComponents, setMapComponents] = useState<any>(null);
-
-  useEffect(() => {
-    async function loadMap() {
-      const leaflet = await import("react-leaflet");
-      await import("leaflet/dist/leaflet.css");
-
-      const L = (await import("leaflet")).default;
-
-      const icon = L.icon({
-        iconUrl:
-          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        iconRetinaUrl:
-          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-        shadowUrl:
-          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-      });
-
-      setMapComponents({
-        ...leaflet,
-        icon,
-      });
-    }
-
-    loadMap();
-  }, []);
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 
-  if (!MapComponents) {
+const icon = L.icon({
+  iconUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+
+export default function CarbonMap({routes}:any){
+
+
+  const school = routes[0];
+
+
+  if(
+    !school ||
+    school.lat === 0 ||
+    school.lng === 0
+  ){
+
     return (
-      <div className="bg-white rounded-xl shadow p-6 mb-8">
-        Loading map...
+
+      <div className="bg-white rounded-xl shadow p-6">
+
+        No map location available for this school.
+
       </div>
+
     );
+
   }
 
 
-  const {
-    MapContainer,
-    TileLayer,
-    Marker,
-    Popup,
-    icon,
-  } = MapComponents;
-
 
   return (
-    <div className="bg-white rounded-xl shadow p-4 mb-8">
 
-      <h2 className="text-2xl font-bold text-green-700 mb-4">
-        🌎 Carbon Impact Map
-      </h2>
+    <div className="h-[500px] rounded-xl overflow-hidden shadow">
 
 
       <MapContainer
-        center={[33.19, -96.65]}
-        zoom={12}
+
+        center={[
+          school.lat,
+          school.lng
+        ]}
+
+        zoom={14}
+
         style={{
-          height: "450px",
-          width: "100%"
+          height:"100%",
+          width:"100%"
         }}
+
       >
 
+
         <TileLayer
+
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution="&copy; OpenStreetMap"
+
+          attribution="© OpenStreetMap"
+
         />
 
 
-        {routes.map((route: any, index: number) => (
 
-          <Marker
-            key={index}
-            position={[
-              route.lat,
-              route.lng
-            ]}
-            icon={icon}
-          >
+        <Marker
 
-            <Popup>
+          position={[
+            school.lat,
+            school.lng
+          ]}
 
-              <b>
-                ZIP {route.zip_code}
-              </b>
+          icon={icon}
 
-              <br />
+        >
 
-              Students: {route.students}
+          <Popup>
 
-              <br />
+            <b>
+              {school.school_name}
+            </b>
 
-              CO₂ Saved: {route.co2_saved} kg
+            <br/>
 
-            </Popup>
+            {school.district}
 
-          </Marker>
+          </Popup>
 
-        ))}
+
+        </Marker>
+
 
       </MapContainer>
 
+
     </div>
+
   );
+
 }

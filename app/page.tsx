@@ -2,63 +2,45 @@
 
 import { useEffect, useState } from "react";
 import CarbonMap from "@/components/CarbonMap";
-import { supabase } from "@/lib/supabase";
-
 
 export default function Home() {
-
   const [schools, setSchools] = useState<any[]>([]);
   const [selectedSchool, setSelectedSchool] = useState<any>(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
 
-
   useEffect(() => {
 
     async function loadSchools() {
 
+      try {
 
-      const { data, error } = await supabase
-        .from("schools")
-        .select("*");
+        const response = await fetch("/us_schools.json");
+
+        const data = await response.json();
 
 
-
-      if (error) {
-
-        console.error(
-          "Supabase error:",
-          error
+        console.log(
+          "Loaded schools:",
+          data.length
         );
 
-        setLoading(false);
 
-        return;
-
-      }
+        setSchools(data);
 
 
+      } catch (error) {
 
-      console.log(
-        "Schools loaded:",
-        data
-      );
-
-
-      setSchools(data || []);
-
-
-
-      if (data && data.length > 0) {
-
-        setSelectedSchool(data[0]);
+        console.error(
+          "Failed to load schools:",
+          error
+        );
 
       }
 
 
       setLoading(false);
-
 
     }
 
@@ -70,34 +52,119 @@ export default function Home() {
 
 
 
+  const filteredSchools = schools
+    .filter((school) => {
 
-  const filteredSchools = schools.filter(
-    (school) =>
-
-      school.school_name
-        .toLowerCase()
-        .includes(search.toLowerCase())
-
-  );
+      if (!search.trim()) return false;
 
 
+      const query = search.toLowerCase();
+
+
+      return (
+
+        school.school_name
+          ?.toLowerCase()
+          .includes(query)
+
+        ||
+
+        school.district
+          ?.toLowerCase()
+          .includes(query)
+
+        ||
+
+        school.city
+          ?.toLowerCase()
+          .includes(query)
+
+        ||
+
+        school.state
+          ?.toLowerCase()
+          .includes(query)
+
+      );
+
+
+    })
+    .slice(0,50);
 
 
 
-  function selectSchool(school:any) {
+  async function selectSchool(school:any){
 
-    setSelectedSchool(school);
+
+    if(school.lat === 0 || school.lng === 0){
+
+
+      try{
+
+
+        const response = await fetch("/api/geocode",{
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":"application/json"
+          },
+
+          body:JSON.stringify({
+
+            name:
+            school.school_name
+            ?.replace(" H S"," High School")
+            ?.replace(" MIDDLE"," Middle School")
+            ?.replace(" EL"," Elementary School"),
+
+            city:school.city,
+
+            state:school.state
+
+          })
+
+
+        });
+
+
+
+        const coords = await response.json();
+
+
+
+        school.lat = coords.lat;
+
+        school.lng = coords.lng;
+
+
+
+      }
+
+      catch(error){
+
+        console.error(
+          "Geocoding failed:",
+          error
+        );
+
+      }
+
+
+    }
+
+
+
+    setSelectedSchool({...school});
+
 
     setSearch("");
 
-  }
+}
 
 
 
-
-
-
-  if (loading) {
+  if(loading){
 
     return (
 
@@ -119,11 +186,9 @@ export default function Home() {
 
 
 
-
   return (
 
     <main className="min-h-screen bg-green-50 p-8">
-
 
 
       <h1 className="text-5xl font-bold text-green-800 mb-4">
@@ -144,14 +209,10 @@ export default function Home() {
 
 
 
-      {/* School Search */}
-
-
-
       <div className="bg-white rounded-xl shadow p-6 mb-8">
 
 
-        <h2 className="text-2xl font-bold mb-4">
+        <h2 className="text-2xl font-bold mb-4 text-green-800">
 
           Find Your School
 
@@ -159,35 +220,25 @@ export default function Home() {
 
 
 
-
         <input
 
-
-          className="w-full border rounded-lg p-3"
-
-
-          placeholder="Search any US school..."
-
+          className="w-full border rounded-lg p-3 text-black"
+          placeholder="Search school, district, city, or state..."
 
           value={search}
-
 
           onChange={(e)=>
             setSearch(e.target.value)
           }
-
 
         />
 
 
 
 
-
         {search.length > 0 && (
 
-
-          <div className="mt-4 space-y-2">
-
+          <div className="mt-4 max-h-96 overflow-y-auto space-y-2">
 
 
             {filteredSchools.length === 0 && (
@@ -202,22 +253,16 @@ export default function Home() {
 
 
 
-
-
             {filteredSchools.map((school,index)=>(
-
 
 
               <button
 
-
                 key={index}
-
 
                 onClick={()=>
                   selectSchool(school)
                 }
-
 
                 className="w-full text-left bg-green-100 hover:bg-green-200 p-4 rounded-lg"
 
@@ -225,28 +270,37 @@ export default function Home() {
               >
 
 
-                🏫 {school.school_name}
+                <div className="font-bold">
+
+                  {school.school_name
+                    ?.replace(" H S", " High School")
+                    ?.replace(" MIDDLE", " Middle School")
+                    ?.replace(" EL", " Elementary School")}
+
+                </div>
 
 
-                <br />
+
+                <div className="text-sm text-gray-700">
+
+                  {school.district}
+
+                </div>
 
 
-                <span className="text-sm">
 
+                <div className="text-sm text-gray-500">
 
                   {school.city}, {school.state}
 
-
-                </span>
+                </div>
 
 
 
               </button>
 
 
-
             ))}
-
 
 
           </div>
@@ -255,11 +309,7 @@ export default function Home() {
         )}
 
 
-
       </div>
-
-
-
 
 
 
@@ -267,23 +317,14 @@ export default function Home() {
 
       {selectedSchool && (
 
-
         <>
-
-
-
-
-
-        {/* Dashboard Cards */}
-
 
 
         <div className="grid md:grid-cols-3 gap-4 mb-8">
 
 
 
-          <div className="bg-white rounded-xl shadow p-6">
-
+          <div className="bg-white rounded-xl shadow p-6 text-gray-900">
 
             <h2 className="font-bold">
 
@@ -294,7 +335,10 @@ export default function Home() {
 
             <p className="text-xl mt-2">
 
-              {selectedSchool.school_name}
+              {selectedSchool.school_name
+              ?.replace(" H S"," High School")
+              ?.replace(" MIDDLE"," Middle School")
+              ?.replace(" EL"," Elementary School")}
 
             </p>
 
@@ -305,9 +349,29 @@ export default function Home() {
 
 
 
+          <div className="bg-white rounded-xl shadow p-6 text-gray-900">
 
-          <div className="bg-white rounded-xl shadow p-6">
+            <h2 className="font-bold">
 
+              District
+
+            </h2>
+
+
+            <p className="mt-2">
+
+              {selectedSchool.district}
+
+            </p>
+
+
+          </div>
+
+
+
+
+
+          <div className="bg-white rounded-xl shadow p-6 text-gray-900">
 
             <h2 className="font-bold">
 
@@ -318,39 +382,14 @@ export default function Home() {
 
             <p className="text-3xl mt-2">
 
-              {selectedSchool.students}
+              {selectedSchool.students && selectedSchool.students > 0
+              ? selectedSchool.students.toLocaleString()
+              : "Estimated data unavailable"}
 
             </p>
 
 
           </div>
-
-
-
-
-
-
-
-          <div className="bg-white rounded-xl shadow p-6">
-
-
-            <h2 className="font-bold">
-
-              CO₂ Saved
-
-            </h2>
-
-
-            <p className="text-3xl mt-2">
-
-              {selectedSchool.co2_saved} kg
-
-            </p>
-
-
-          </div>
-
-
 
 
         </div>
@@ -359,29 +398,20 @@ export default function Home() {
 
 
 
+        {
+          selectedSchool.lat !== 0 &&
+          selectedSchool.lng !== 0 &&
+
+          <CarbonMap
+
+            routes={[selectedSchool]}
+
+          />
+
+        }
 
 
 
-        {/* Map */}
-
-
-
-        <CarbonMap
-
-          routes={[
-            selectedSchool
-          ]}
-
-        />
-
-
-
-
-
-
-
-
-        {/* AI Recommendation */}
 
 
 
@@ -390,20 +420,22 @@ export default function Home() {
 
           <h2 className="text-2xl font-bold text-green-700">
 
-
-            🤖 AI Route Recommendation
-
+            🤖 AI Commute Recommendation
 
           </h2>
 
 
 
-
           <p className="mt-4 whitespace-pre-wrap">
 
-
-            {selectedSchool.ai_recommendation}
-
+            {selectedSchool.ai_recommendation 
+            || 
+            `
+          • Create supervised walking groups near ${selectedSchool.school_name}.
+          • Encourage bike and walking routes within the school zone.
+          • Estimated commute emissions can be reduced by shifting short car trips.
+          `
+          }
 
           </p>
 
@@ -413,20 +445,14 @@ export default function Home() {
 
 
 
-
-
-
         </>
 
+
       )}
-
-
-
 
 
     </main>
 
   );
-
 
 }
