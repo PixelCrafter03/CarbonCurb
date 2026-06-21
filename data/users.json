@@ -1,0 +1,25 @@
+[
+ {
+  "id":1,
+  "name":"Alex",
+  "role":"student",
+  "school":"Heritage H S",
+  "zip":"75070"
+ },
+
+
+ {
+  "id":2,
+  "name":"Parent User",
+  "role":"parent",
+  "student":"Alex"
+ },
+
+
+ {
+  "id":3,
+  "name":"Admin",
+  "role":"school_admin",
+  "school":"Heritage H S"
+ }
+]

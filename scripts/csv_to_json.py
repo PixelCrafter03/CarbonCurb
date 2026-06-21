@@ -1,11 +1,12 @@
 import pandas as pd
+import json
 
-df = pd.read_csv("data/carboncurb_clustered.csv")
+df = pd.read_csv("carboncurb_clustered.csv")
 
 df.to_json(
-    "data/carboncurb_clustered.json",
+    "public/clusters.json",
     orient="records",
     indent=2
 )
 
-print("JSON created!")
+print("Created clusters.json")

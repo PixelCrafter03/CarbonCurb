@@ -1,458 +1,1018 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CarbonMap from "@/components/CarbonMap";
+import dynamic from "next/dynamic";
 
-export default function Home() {
-  const [schools, setSchools] = useState<any[]>([]);
-  const [selectedSchool, setSelectedSchool] = useState<any>(null);
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
 
+const CarbonMap = dynamic(
+  () => import("@/components/CarbonMap"),
+  {
+    ssr:false
+  }
+);
 
-  useEffect(() => {
 
-    async function loadSchools() {
 
-      try {
+export default function Home(){
 
-        const response = await fetch("/us_schools.json");
 
-        const data = await response.json();
+const [schools,setSchools] = useState<any[]>([]);
 
+const [students,setStudents] = useState<any[]>([]);
 
-        console.log(
-          "Loaded schools:",
-          data.length
-        );
+const [clusters,setClusters] = useState<any[]>([]);
 
 
-        setSchools(data);
+const [search,setSearch] = useState("");
 
+const [selectedSchool,setSelectedSchool] = useState<any>(null);
 
-      } catch (error) {
+const [loading,setLoading] = useState(true);
 
-        console.error(
-          "Failed to load schools:",
-          error
-        );
 
-      }
 
 
-      setLoading(false);
 
-    }
+useEffect(()=>{
 
 
-    loadSchools();
+async function loadData(){
 
 
-  }, []);
+try{
 
 
+const schoolData =
+await fetch("/texas_schools.json")
+.then(r=>r.json());
 
-  const filteredSchools = schools
-    .filter((school) => {
 
-      if (!search.trim()) return false;
+const studentData =
+await fetch("/students.json")
+.then(r=>r.json());
 
 
-      const query = search.toLowerCase();
+let clusterData=[];
 
 
-      return (
+try{
 
-        school.school_name
-          ?.toLowerCase()
-          .includes(query)
+clusterData =
+await fetch("/clusters.json")
+.then(r=>r.json());
 
-        ||
+}
 
-        school.district
-          ?.toLowerCase()
-          .includes(query)
+catch{
 
-        ||
-
-        school.city
-          ?.toLowerCase()
-          .includes(query)
-
-        ||
-
-        school.state
-          ?.toLowerCase()
-          .includes(query)
-
-      );
-
-
-    })
-    .slice(0,50);
-
-
-
-  async function selectSchool(school:any){
-
-
-    if(school.lat === 0 || school.lng === 0){
-
-
-      try{
-
-
-        const response = await fetch("/api/geocode",{
-
-          method:"POST",
-
-          headers:{
-            "Content-Type":"application/json"
-          },
-
-          body:JSON.stringify({
-
-            name:
-            school.school_name
-            ?.replace(" H S"," High School")
-            ?.replace(" MIDDLE"," Middle School")
-            ?.replace(" EL"," Elementary School"),
-
-            city:school.city,
-
-            state:school.state
-
-          })
-
-
-        });
-
-
-
-        const coords = await response.json();
-
-
-
-        school.lat = coords.lat;
-
-        school.lng = coords.lng;
-
-
-
-      }
-
-      catch(error){
-
-        console.error(
-          "Geocoding failed:",
-          error
-        );
-
-      }
-
-
-    }
-
-
-
-    setSelectedSchool({...school});
-
-
-    setSearch("");
+clusterData=[];
 
 }
 
 
 
-  if(loading){
 
-    return (
+setSchools(schoolData);
 
-      <main className="min-h-screen bg-green-50 p-8">
+setStudents(studentData);
 
-        <h1 className="text-4xl font-bold text-green-800">
+setClusters(clusterData);
 
-          Loading CarbonCurb 🌱
 
-        </h1>
 
-      </main>
+}
 
-    );
+catch(error){
 
-  }
+console.error(error);
 
+}
 
 
+setLoading(false);
 
 
-  return (
+}
 
-    <main className="min-h-screen bg-green-50 p-8">
 
 
-      <h1 className="text-5xl font-bold text-green-800 mb-4">
+loadData();
 
-        CarbonCurb 🌱
 
-      </h1>
 
+},[]);
 
 
-      <p className="text-lg text-gray-700 mb-8">
 
-        AI-powered sustainable school commute planning across the United States.
 
-      </p>
 
 
 
 
 
-      <div className="bg-white rounded-xl shadow p-6 mb-8">
+const filteredSchools =
 
+schools.filter((school)=>{
 
-        <h2 className="text-2xl font-bold mb-4 text-green-800">
 
-          Find Your School
+if(!search.trim())
+return false;
 
-        </h2>
 
+const q =
+search.toLowerCase();
 
 
-        <input
 
-          className="w-full border rounded-lg p-3 text-black"
-          placeholder="Search school, district, city, or state..."
+return (
 
-          value={search}
+school.school_name
+?.toLowerCase()
+.includes(q)
 
-          onChange={(e)=>
-            setSearch(e.target.value)
-          }
 
-        />
+||
 
+school.district
+?.toLowerCase()
+.includes(q)
 
 
+||
 
-        {search.length > 0 && (
+school.city
+?.toLowerCase()
+.includes(q)
 
-          <div className="mt-4 max-h-96 overflow-y-auto space-y-2">
 
+);
 
-            {filteredSchools.length === 0 && (
 
-              <p className="text-gray-500">
+})
 
-                No schools found
+.slice(0,15);
 
-              </p>
 
-            )}
 
 
 
-            {filteredSchools.map((school,index)=>(
 
 
-              <button
 
-                key={index}
 
-                onClick={()=>
-                  selectSchool(school)
-                }
+function selectSchool(school:any){
 
-                className="w-full text-left bg-green-100 hover:bg-green-200 p-4 rounded-lg"
 
+setSelectedSchool(school);
 
-              >
+setSearch(school.school_name);
 
 
-                <div className="font-bold">
+}
 
-                  {school.school_name
-                    ?.replace(" H S", " High School")
-                    ?.replace(" MIDDLE", " Middle School")
-                    ?.replace(" EL", " Elementary School")}
 
-                </div>
 
 
 
-                <div className="text-sm text-gray-700">
 
-                  {school.district}
 
-                </div>
 
 
+function distance(
 
-                <div className="text-sm text-gray-500">
+lat1:number,
+lng1:number,
+lat2:number,
+lng2:number
 
-                  {school.city}, {school.state}
+){
 
-                </div>
 
+const x =
+(lat2-lat1)*69;
 
 
-              </button>
+const y =
+(lng2-lng1)*54;
 
 
-            ))}
+return Math.sqrt(
+x*x+y*y
+);
 
 
-          </div>
+}
 
 
-        )}
 
 
-      </div>
 
 
 
 
 
-      {selectedSchool && (
+function generateGroups(){
 
-        <>
 
+if(!selectedSchool)
 
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
+return [];
 
 
 
-          <div className="bg-white rounded-xl shadow p-6 text-gray-900">
+const groups:any = {};
 
-            <h2 className="font-bold">
 
-              School
 
-            </h2>
+students.forEach((student)=>{
 
 
-            <p className="text-xl mt-2">
+const d = distance(
 
-              {selectedSchool.school_name
-              ?.replace(" H S"," High School")
-              ?.replace(" MIDDLE"," Middle School")
-              ?.replace(" EL"," Elementary School")}
+student.lat,
 
-            </p>
+student.lng,
 
+Number(selectedSchool.lat),
 
-          </div>
+Number(selectedSchool.lng)
 
+);
 
 
 
+if(d <= 2){
 
-          <div className="bg-white rounded-xl shadow p-6 text-gray-900">
 
-            <h2 className="font-bold">
 
-              District
+if(!groups[student.zip_code])
 
-            </h2>
+groups[student.zip_code]=[];
 
 
-            <p className="mt-2">
 
-              {selectedSchool.district}
+groups[student.zip_code]
+.push(student);
 
-            </p>
 
 
-          </div>
+}
 
 
 
+});
 
 
-          <div className="bg-white rounded-xl shadow p-6 text-gray-900">
 
-            <h2 className="font-bold">
+return Object.entries(groups)
 
-              Students
+.filter(
+([zip,list]:any)=>
 
-            </h2>
+list.length >=3
 
+);
 
-            <p className="text-3xl mt-2">
 
-              {selectedSchool.students && selectedSchool.students > 0
-              ? selectedSchool.students.toLocaleString()
-              : "Estimated data unavailable"}
 
-            </p>
+}
 
 
-          </div>
 
 
-        </div>
 
 
 
 
 
-        {
-          selectedSchool.lat !== 0 &&
-          selectedSchool.lng !== 0 &&
+const commuteGroups =
+generateGroups();
 
-          <CarbonMap
 
-            routes={[selectedSchool]}
 
-          />
 
-        }
 
 
+const nearbyStudents =
 
+commuteGroups.flatMap(
 
+([zip,list]:any)=>
 
+list
 
-        <div className="bg-white rounded-xl shadow p-6 mt-8">
+);
 
 
-          <h2 className="text-2xl font-bold text-green-700">
 
-            🤖 AI Commute Recommendation
 
-          </h2>
 
 
+const carbonSaved =
 
-          <p className="mt-4 whitespace-pre-wrap">
 
-            {selectedSchool.ai_recommendation 
-            || 
-            `
-          • Create supervised walking groups near ${selectedSchool.school_name}.
-          • Encourage bike and walking routes within the school zone.
-          • Estimated commute emissions can be reduced by shifting short car trips.
-          `
-          }
+nearbyStudents.length *
 
-          </p>
+2 *
 
+5 *
 
+0.404;
 
-        </div>
 
 
 
-        </>
 
 
-      )}
 
 
-    </main>
 
-  );
+
+if(loading){
+
+
+return (
+
+<main className="p-10">
+
+
+<h1 className="text-4xl font-bold text-green-800">
+
+Loading CarbonCurb 🌱
+
+</h1>
+
+
+</main>
+
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+return (
+
+
+
+<main className="min-h-screen bg-green-50 p-8">
+
+
+
+
+
+
+
+<h1 className="text-5xl font-bold text-green-900">
+
+CarbonCurb 🌱
+
+</h1>
+
+
+<p className="mt-3 mb-8 text-gray-700 text-lg">
+
+AI-powered sustainable school commute planning
+
+</p>
+
+
+
+
+
+
+
+
+
+{/* METRICS */}
+
+
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+
+
+<div className="bg-white rounded-xl shadow p-6 border">
+
+<h3 className="font-semibold text-gray-700">
+
+Students Analyzed
+
+</h3>
+
+
+<p className="text-4xl font-bold text-green-800 mt-2">
+
+{students.length}
+
+</p>
+
+
+<p className="text-gray-600">
+
+AI processed locations
+
+</p>
+
+</div>
+
+
+
+
+
+
+<div className="bg-white rounded-xl shadow p-6 border">
+
+<h3 className="font-semibold text-gray-700">
+
+Walking Groups
+
+</h3>
+
+
+<p className="text-4xl font-bold text-green-800 mt-2">
+
+{commuteGroups.length}
+
+</p>
+
+
+<p className="text-gray-600">
+
+Generated commute hubs
+
+</p>
+
+</div>
+
+
+
+
+
+
+
+<div className="bg-white rounded-xl shadow p-6 border">
+
+<h3 className="font-semibold text-gray-700">
+
+CO₂ Saved Weekly
+
+</h3>
+
+
+<p className="text-4xl font-bold text-green-800 mt-2">
+
+{carbonSaved.toFixed(1)} kg
+
+</p>
+
+
+<p className="text-gray-600">
+
+Estimated reduction
+
+</p>
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{/* SEARCH */}
+
+
+
+
+<div className="bg-white rounded-xl shadow p-6">
+
+
+
+<h2 className="text-2xl font-bold text-green-900">
+
+Find Your School
+
+</h2>
+
+
+
+<input
+
+
+className="
+w-full
+border
+rounded-lg
+p-3
+mt-4
+text-black
+"
+
+
+placeholder="Search school..."
+
+
+value={search}
+
+
+onChange={(e)=>
+
+setSearch(e.target.value)
+
+}
+
+
+
+/>
+
+
+
+
+{
+
+search && !selectedSchool && (
+
+
+
+<div className="mt-4 space-y-3">
+
+
+{
+
+filteredSchools.map(
+
+(school,index)=>(
+
+
+<button
+
+
+key={index}
+
+
+className="
+w-full
+text-left
+bg-green-100
+hover:bg-green-200
+rounded-lg
+p-4
+text-gray-900
+"
+
+
+onClick={()=>selectSchool(school)}
+
+
+>
+
+
+<b>
+
+{school.school_name}
+
+</b>
+
+
+<br/>
+
+{school.district}
+
+
+<br/>
+
+{school.city}, {school.state}
+
+
+
+</button>
+
+
+)
+
+)
+
+
+}
+
+
+</div>
+
+
+)
+
+
+
+}
+
+
+
+
+
+{
+
+selectedSchool &&
+
+<button
+
+className="
+mt-3
+font-semibold
+text-red-700
+"
+
+onClick={()=>{
+
+setSelectedSchool(null);
+
+setSearch("");
+
+}}
+
+
+>
+
+✕ Clear School
+
+</button>
+
+
+}
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+
+selectedSchool && (
+
+
+
+<>
+
+
+
+
+
+
+
+
+
+<div className="mt-8 bg-white rounded-xl shadow p-6">
+
+
+<h2 className="text-3xl font-bold text-green-900">
+
+{selectedSchool.school_name}
+
+</h2>
+
+
+
+<p className="text-gray-700">
+
+{selectedSchool.city},
+
+{selectedSchool.state}
+
+</p>
+
+
+
+
+
+
+
+
+
+<h3 className="mt-8 text-2xl font-bold text-green-900">
+
+🚶 AI Walking Groups
+
+</h3>
+
+
+
+
+
+<div className="grid md:grid-cols-2 gap-5 mt-4">
+
+
+
+{
+
+commuteGroups.map(
+
+([zip,list]:any,index)=>(
+
+
+
+<div
+
+key={index}
+
+className="
+bg-green-100
+rounded-xl
+p-5
+text-gray-900
+border
+"
+
+
+>
+
+
+
+<h4 className="text-xl font-bold text-green-900">
+
+Group {index+1}
+
+</h4>
+
+
+<p className="mt-2 font-semibold">
+
+ZIP: {zip}
+
+</p>
+
+
+<p className="font-semibold">
+
+Students: {list.length}
+
+</p>
+
+
+
+<p className="text-gray-700 mt-2">
+
+AI walking hub created
+
+</p>
+
+
+
+</div>
+
+
+
+)
+
+
+)
+
+
+}
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<h3 className="mt-8 text-2xl font-bold text-green-900">
+
+🤖 AI Emission Zones
+
+</h3>
+
+
+
+
+
+
+
+<div className="space-y-4 mt-4">
+
+
+
+{
+
+clusters.slice(0,5).map(
+
+(zone,index)=>{
+
+
+const badge =
+
+zone.risk_level==="High"
+
+?
+
+"bg-red-200 text-red-900"
+
+:
+
+zone.risk_level==="Medium"
+
+?
+
+"bg-yellow-200 text-yellow-900"
+
+:
+
+"bg-green-200 text-green-900";
+
+
+
+
+
+return (
+
+<div
+
+key={index}
+
+className="
+bg-green-100
+rounded-xl
+p-5
+flex
+justify-between
+items-center
+text-gray-900
+"
+
+
+>
+
+
+<div>
+
+
+<h4 className="font-bold text-lg">
+
+{zone.location}
+
+</h4>
+
+
+<p>
+
+CO₂ Impact:
+
+<b>
+
+{zone.estimated_co2}
+
+</b>
+
+
+</p>
+
+
+</div>
+
+
+
+
+<div
+
+className={`px-4 py-2 rounded-full font-bold ${badge}`}
+
+>
+
+{zone.risk_level}
+
+</div>
+
+
+
+
+</div>
+
+
+)
+
+
+
+}
+
+
+)
+
+}
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div className="mt-8 bg-white rounded-xl shadow p-5">
+
+
+<h2 className="text-2xl font-bold text-green-900 mb-4">
+
+AI Commute Map
+
+</h2>
+
+
+
+<CarbonMap
+
+
+school={{
+
+...selectedSchool,
+
+lat:Number(selectedSchool.lat),
+
+lng:Number(selectedSchool.lng)
+
+}}
+
+
+
+groups={commuteGroups}
+
+
+
+students={nearbyStudents}
+
+
+
+/>
+
+
+
+</div>
+
+
+
+
+
+
+
+</>
+
+)
+
+
+
+}
+
+
+
+
+
+
+</main>
+
+
+);
+
 
 }

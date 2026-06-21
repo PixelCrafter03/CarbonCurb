@@ -1,0 +1,110 @@
+[
+  {
+    "school_id": "heritage-hs",
+    "school_name": "HERITAGE H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.1796,
+    "lng": -96.7508
+  },
+  {
+    "school_id": "liberty-hs",
+    "school_name": "LIBERTY H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.2368,
+    "lng": -96.7873
+  },
+  {
+    "school_id": "independence-hs",
+    "school_name": "INDEPENDENCE H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.1708,
+    "lng": -96.7488
+  },
+  {
+    "school_id": "wakeland-hs",
+    "school_name": "WAKELAND H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.1637,
+    "lng": -96.8756
+  },
+  {
+    "school_id": "reedy-hs",
+    "school_name": "REEDY H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.1280,
+    "lng": -96.8785
+  },
+  {
+    "school_id": "memorial-hs",
+    "school_name": "MEMORIAL H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.2160,
+    "lng": -96.8480
+  },
+  {
+    "school_id": "lone-star-hs",
+    "school_name": "LONE STAR H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.1400,
+    "lng": -96.8900
+  },
+  {
+    "school_id": "centennial-hs",
+    "school_name": "CENTENNIAL H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.1800,
+    "lng": -96.8200
+  },
+  {
+    "school_id": "frisco-hs",
+    "school_name": "FRISCO H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.1497,
+    "lng": -96.8236
+  },
+  {
+    "school_id": "lebanon-trail-hs",
+    "school_name": "LEBANON TRAIL H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.1650,
+    "lng": -96.9120
+  },
+  {
+    "school_id": "panther-creek-hs",
+    "school_name": "PANTHER CREEK H S",
+    "district": "FRISCO ISD",
+    "city": "FRISCO",
+    "state": "TX",
+    "lat": 33.2500,
+    "lng": -96.8200
+  },
+  {
+    "school_id": "emerson-hs",
+    "school_name": "EMERSON H S",
+    "district": "FRISCO ISD",
+    "city": "MCKINNEY",
+    "state": "TX",
+    "lat": 33.2200,
+    "lng": -96.7300
+  }
+]
