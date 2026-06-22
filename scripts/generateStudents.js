@@ -1,41 +1,109 @@
 const fs = require("fs");
 
-const zipCenters = {
-  "75034": { lat: 33.150, lng: -96.840 },
-  "75035": { lat: 33.160, lng: -96.760 },
-  "75036": { lat: 33.140, lng: -96.900 },
-  "75068": { lat: 33.120, lng: -96.950 },
-  "75069": { lat: 33.197, lng: -96.615 },
-  "75070": { lat: 33.170, lng: -96.680 },
-  "75071": { lat: 33.250, lng: -96.680 },
-  "75072": { lat: 33.190, lng: -96.730 }
-};
 
-const zips = Object.keys(zipCenters);
+// Heritage High School boundary box
+const minLat = 33.175;
+const maxLat = 33.207;
 
-const students = [];
+const minLng = -96.790;
+const maxLng = -96.728;
 
-for (let i = 1; i <= 100; i++) {
-  const zip =
-    zips[Math.floor(Math.random() * zips.length)];
 
-  const center = zipCenters[zip];
 
-  students.push({
-    student_id: i,
-    zip_code: zip,
-    lat:
-      center.lat +
-      (Math.random() - 0.5) * 0.02,
-    lng:
-      center.lng +
-      (Math.random() - 0.5) * 0.02
-  });
-}
+function pointInside(lat,lng){
 
-fs.writeFileSync(
-  "public/students.json",
-  JSON.stringify(students, null, 2)
+
+return (
+
+lat >= minLat &&
+lat <= maxLat &&
+lng >= minLng &&
+lng <= maxLng
+
 );
 
-console.log("Generated 100 students.");
+
+}
+
+
+
+const students=[];
+
+
+let attempts=0;
+
+
+
+while(
+students.length < 200 &&
+attempts < 50000
+){
+
+
+attempts++;
+
+
+const lat =
+minLat +
+Math.random() *
+(maxLat-minLat);
+
+
+
+const lng =
+minLng +
+Math.random() *
+(maxLng-minLng);
+
+
+
+if(pointInside(lat,lng)){
+
+
+students.push({
+
+student_id:
+students.length+1,
+
+
+lat:
+Number(lat.toFixed(6)),
+
+
+lng:
+Number(lng.toFixed(6)),
+
+
+zip_code:
+"75035"
+
+
+});
+
+
+}
+
+
+}
+
+
+
+fs.writeFileSync(
+
+"public/students.json",
+
+JSON.stringify(
+students,
+null,
+2
+)
+
+);
+
+
+
+console.log(
+"Generated",
+students.length,
+"students"
+);

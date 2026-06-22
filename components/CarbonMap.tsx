@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect,useState} from "react";
 
 import {
   MapContainer,
@@ -17,21 +17,45 @@ import L from "leaflet";
 
 
 
+
+
 delete (L.Icon.Default.prototype as any)._getIconUrl;
+
 
 
 L.Icon.Default.mergeOptions({
 
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+iconRetinaUrl:
+"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
 
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+iconUrl:
+"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
 
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png"
+shadowUrl:
+"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png"
 
 });
+
+
+
+
+
+
+
+const COLORS = [
+
+"#16a34a",
+"#2563eb",
+"#9333ea",
+"#ea580c",
+"#dc2626",
+"#0891b2",
+"#ca8a04",
+"#db2777"
+
+];
+
+
 
 
 
@@ -47,60 +71,67 @@ students=[]
 
 }:any){
 
-const [routes,setRoutes] = useState<any[]>([]);
 
-if(!school)
 
-return null;
+const [routes,setRoutes]=useState<any[]>([]);
+
+const [mounted,setMounted]=useState(false);
+
+
+
 
 
 
 
 useEffect(()=>{
 
-
-return ()=>{
-
-
-const containers =
-document.querySelectorAll(".leaflet-container");
+setMounted(true);
 
 
-containers.forEach((container:any)=>{
-
-
-if(container._leaflet_id){
-
-delete container._leaflet_id;
-
-}
-
-
-});
-
-
-};
+return()=>setMounted(false);
 
 
 },[]);
 
 
+
+
+
+
+
+
 useEffect(()=>{
 
 
-async function buildRoutes(){
 
-
-const newRoutes:any[] = [];
+async function createRoutes(){
 
 
 
-for(const [zip,members] of groups){
+const built:any[]=[];
+
+
+
+
+for(
+const [index,group]
+of groups.entries()
+
+){
+
+
+
+const members = group;
+
 
 
 if(!members || members.length===0)
 
 continue;
+
+
+
+
 
 
 
@@ -110,11 +141,13 @@ members.reduce(
 
 (sum:number,s:any)=>
 
-sum + Number(s.lat),
+sum+Number(s.lat)
 
-0
+,0)
 
-)/members.length;
+/members.length;
+
+
 
 
 
@@ -125,11 +158,15 @@ members.reduce(
 
 (sum:number,s:any)=>
 
-sum + Number(s.lng),
+sum+Number(s.lng)
 
-0
+,0)
 
-)/members.length;
+/members.length;
+
+
+
+
 
 
 
@@ -143,16 +180,16 @@ const url =
 
 
 
+
+
+
 try{
 
 
-const response =
-await fetch(url);
+const res = await fetch(url);
 
+const data = await res.json();
 
-
-const data =
-await response.json();
 
 
 
@@ -160,59 +197,59 @@ await response.json();
 if(data.routes?.length){
 
 
-newRoutes.push(
+built[index]=
+
 
 data.routes[0]
+
 .geometry
+
 .coordinates
-.map(
 
-(point:any)=>
+.map((p:any)=>[
 
-[
+p[1],
+p[0]
 
-point[1],
+]);
 
-point[0]
 
-]
 
+}
+
+
+
+}
+
+catch(e){
+
+console.log("route error",e);
+
+}
+
+
+
+}
+
+
+
+
+setRoutes(built);
+
+
+
+}
+
+
+
+
+
+if(
+school &&
+groups.length
 )
 
-);
-
-
-
-}
-
-
-
-}
-
-catch(error){
-
-console.log(error);
-
-}
-
-
-
-}
-
-
-
-
-setRoutes(newRoutes);
-
-
-
-}
-
-
-
-if(groups.length > 0)
-
-buildRoutes();
+createRoutes();
 
 
 
@@ -220,20 +257,45 @@ buildRoutes();
 
 
 
-return (
 
-<div className="rounded-xl overflow-hidden shadow">
+
+
+
+
+
+if(!mounted || !school)
+
+return null;
+
+
+
+
+
+
+
+
+
+return(
+
+
+
+<div className="rounded-2xl overflow-hidden shadow-xl">
 
 
 
 <MapContainer
 
 
+
+key={`${school.lat}-${school.lng}`}
+
+
+
 center={[
 
-school.lat,
+Number(school.lat),
 
-school.lng
+Number(school.lng)
 
 ]}
 
@@ -257,6 +319,9 @@ width:"100%"
 
 
 
+
+
+
 <TileLayer
 
 
@@ -273,21 +338,67 @@ url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 
 
 
+{/* LEGEND */}
+
+
+
+<div
+
+className="absolute top-5 right-5 bg-white p-5 rounded-xl shadow-lg z-[1000]"
+
+>
+
+
+<h3 className="font-bold text-lg">
+
+CarbonCurb AI Map
+
+</h3>
+
+
+<p>
+🟢 School
+</p>
+
+
+<p>
+🔵 Student Homes
+</p>
+
+
+<p>
+🟣 AI Walking Hubs
+</p>
+
+
+<p>
+🌈 AI Optimized Routes
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+
 {/* SCHOOL */}
+
 
 
 <Marker
 
-
 position={[
 
-school.lat,
+Number(school.lat),
 
-school.lng
+Number(school.lng)
 
 ]}
-
-
 
 >
 
@@ -295,23 +406,20 @@ school.lng
 <Popup>
 
 
-<b>
-
-{school.school_name}
-
-</b>
-
+<b>{school.school_name}</b>
 
 <br/>
 
 School
 
-
 </Popup>
 
 
-
 </Marker>
+
+
+
+
 
 
 
@@ -325,66 +433,69 @@ School
 
 
 
-
-
 {
 
 students.map(
 
-(student:any)=>(
+(student:any,i:number)=>(
+
 
 
 <CircleMarker
 
 
-key={
+key={i}
 
-student.student_id
-
-}
 
 
 center={[
 
-student.lat,
+Number(student.lat),
 
-student.lng
+Number(student.lng)
 
 ]}
+
 
 
 radius={7}
 
 
+
+pathOptions={{
+
+color:"#2563eb",
+
+fillColor:"#60a5fa",
+
+fillOpacity:.85
+
+}}
+
 >
+
 
 
 <Popup>
 
-
-Student #{student.student_id}
-
+Student Home
 
 <br/>
 
-
 ZIP:
-
 {student.zip_code}
 
-
-
 </Popup>
+
 
 
 </CircleMarker>
 
 
-)
 
 )
 
-
+)
 
 }
 
@@ -396,22 +507,23 @@ ZIP:
 
 
 
-{/* GROUP ROUTES */}
 
 
+
+
+{/* GROUPS */}
 
 
 
 {
 
-
 groups.map(
 
-([zip,members]:any,index:number)=>{
+([type,members]:any,index:number)=>{
 
 
 
-if(!members || members.length===0)
+if(!members?.length)
 
 return null;
 
@@ -419,23 +531,24 @@ return null;
 
 
 
-const hubLat =
 
+const color = COLORS[index % COLORS.length];
+
+
+
+
+
+const hubLat =
 
 members.reduce(
 
 (sum:number,s:any)=>
 
-sum + Number(s.lat),
+sum+Number(s.lat)
 
-0
+,0)
 
-)
-
-
-/
-
-members.length;
+/members.length;
 
 
 
@@ -444,40 +557,39 @@ members.length;
 
 const hubLng =
 
-
 members.reduce(
 
 (sum:number,s:any)=>
 
-sum + Number(s.lng),
+sum+Number(s.lng)
 
-0
+,0)
 
-)
-
-
-/
-
-members.length;
+/members.length;
 
 
 
 
 
 
-return (
+
+return(
+
 
 
 <React.Fragment
 
-key={
-
-"cluster-"+index
-
-}
+key={index}
 
 >
 
+
+
+
+
+
+
+{/* AI HUB */}
 
 
 
@@ -495,8 +607,19 @@ hubLng
 
 
 
-radius={12}
+radius={18}
 
+
+
+pathOptions={{
+
+color,
+
+fillColor:color,
+
+fillOpacity:.75
+
+}}
 
 >
 
@@ -505,9 +628,10 @@ radius={12}
 <Popup>
 
 
+
 <b>
 
-AI Walking Hub
+AI Walking Hub #{index+1}
 
 </b>
 
@@ -515,9 +639,9 @@ AI Walking Hub
 <br/>
 
 
-ZIP:
+Type:
 
-{zip}
+{type}
 
 
 <br/>
@@ -542,23 +666,23 @@ Students:
 
 
 
+
+
+{/* HOME TO HUB */}
+
+
+
 {
 
 members.map(
 
-(student:any)=>(
-
+(student:any,j:number)=>(
 
 
 <Polyline
 
 
-key={
-
-"student-route-"+student.student_id
-
-}
-
+key={j}
 
 
 positions={[
@@ -572,7 +696,6 @@ Number(student.lat),
 Number(student.lng)
 
 ],
-
 
 
 
@@ -590,6 +713,17 @@ hubLng
 
 
 
+pathOptions={{
+
+
+color:"#94a3b8",
+
+weight:2
+
+}}
+
+
+
 />
 
 
@@ -598,14 +732,17 @@ hubLng
 
 )
 
-
-
 }
 
 
 
 
 
+
+
+
+
+{/* ANIMATED ROUTE */}
 
 
 
@@ -617,21 +754,42 @@ routes[index] &&
 <Polyline
 
 
-key={
-
-"route-"+index
-
-}
-
 
 positions={routes[index]}
+
+
+
+pathOptions={{
+
+
+
+color,
+
+
+
+weight:6,
+
+
+opacity:.9,
+
+
+
+className:
+
+"route-animation"
+
+
+
+}}
 
 
 
 />
 
 
+
 }
+
 
 
 
@@ -644,15 +802,17 @@ positions={routes[index]}
 
 )
 
-}
 
+}
 
 
 )
 
-
-
 }
+
+
+
+
 
 
 
@@ -662,10 +822,57 @@ positions={routes[index]}
 
 
 
+
+
+<style jsx global>{`
+
+
+.route-animation{
+
+
+stroke-dasharray:12;
+
+animation:
+
+dash 2s linear infinite;
+
+
+}
+
+
+
+@keyframes dash{
+
+
+from{
+
+stroke-dashoffset:40;
+
+}
+
+
+to{
+
+stroke-dashoffset:0;
+
+}
+
+
+
+}
+
+
+`}</style>
+
+
+
+
+
 </div>
 
 
-);
+
+)
 
 
 }

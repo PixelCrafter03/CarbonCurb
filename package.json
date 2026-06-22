@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
+    "@turf/boolean-point-in-polygon": "^7.3.5",
+    "@turf/helpers": "^7.3.5",
+    "@turf/turf": "^7.3.5",
     "csv-parser": "^3.2.1",
     "firebase": "^12.15.0",
     "leaflet": "^1.9.4",
